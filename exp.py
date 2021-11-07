@@ -103,7 +103,7 @@ def run_kmeans(X, k, dataname):
         #plt.clf()
 
 
-def silhoutte_plt(X, k, m, dataname, modelname):
+def silhoutte_plt(X, k, m, dataname, modelname, mm):
     plt.clf()
     n_cs=np.arange(2, k)
     s=[]
@@ -114,7 +114,7 @@ def silhoutte_plt(X, k, m, dataname, modelname):
         for _ in range(iters):
             clf=m(n).fit(X) 
             labels=clf.predict(X)
-            ss=metrics.silhouette_score(X, labels, metric='euclidean')
+            ss=metrics.silhouette_score(X, labels, metric=mm)
             tmp_s.append(ss)
         val=np.mean(getB(np.array(tmp_s), int(iters/5)))
         err=np.std(tmp_s)
@@ -285,7 +285,7 @@ def run():
     ##KMeans
     k = list(range(2,5))
     #liver patients
-    silhoutte_plt(liv_full, 10, KMeans, "liver_patients", "KMeans")
+    silhoutte_plt(liv_full, 10, KMeans, "liver_patients", "KMeans",  "euclidean")
     print("sil plot done for liver kmeans")
     run_kmeans(liv_full, k, "liver_patients")
     print("kmeans plot done for liver")
@@ -296,7 +296,7 @@ def run():
 
 
     #bank marketing
-    silhoutte_plt(bm_full, 10, KMeans, "bm", "KMeans")
+    silhoutte_plt(bm_full, 10, KMeans, "bm", "KMeans", "manhattan")
     print("sil plot done for bm kmeans")
     run_kmeans(bm_full, k, "bm")
     print("kmeans plot done for bm")
@@ -305,14 +305,14 @@ def run():
 
     k = list(range(2,5))
     #liver patients
-    silhoutte_plt(liv_full, 10, GaussianMixture, "liver_patients", "Gaussiam_M")
+    silhoutte_plt(liv_full, 10, GaussianMixture, "liver_patients", "Gaussiam_M", "euclidean")
     print("sil plot done for liver gaussian mix")
     dist_bw_gmmplots(liv_full, 10, "liver_patients")
     print("gaussian plots done for liver gaussian mix")
     bics(liv_full, 10, "liver_patients")
     print("bic plots done for liver patients gaussian mix")
 
-    silhoutte_plt(bm_full, 10, GaussianMixture, "bm", "Gaussiam_M")
+    silhoutte_plt(bm_full, 10, GaussianMixture, "bm", "Gaussiam_M", "manhattan")
     print("sil plot done for bm gaussian mix")
     dist_bw_gmmplots(bm_full, 10, "bm")
     print("gaussian plots done for bm gaussian mix")
