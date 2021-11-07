@@ -202,7 +202,7 @@ def write_to_csv_pca(
 
 def runPCA(X, y, dataname):
     plt.clf()
-    ress = PCA().fit(liv_full)
+    ress = PCA().fit(X)
     plt.plot(range(1, len(ress.explained_variance_ratio_) + 1), ress.explained_variance_ratio_)
     plt.plot(range(1, len(ress.explained_variance_ratio_) + 1), np.cumsum(ress.explained_variance_ratio_))
     plt.title("Cumulative Explained Variance")
@@ -211,7 +211,7 @@ def runPCA(X, y, dataname):
     plt.savefig("files/part2/"+ dataname + "_PCA_cumulative_exp_variance_" + "plot.png")
     plt.clf()
 
-    nc = 2
+    nc = 1
 
     ress2 = PCA(n_components= nc).fit(X)
     origshape = X.shape
