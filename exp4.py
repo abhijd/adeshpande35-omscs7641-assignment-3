@@ -319,11 +319,33 @@ def write_to_csv(
 
 def runAll(X, y, dataname, ncPCA, ncICA, ncRP, ncSVD):
     print("Running for " + dataname)
+
+    classifier = MLPClassifier(max_iter= 5000, hidden_layer_sizes=(8), activation='logistic', verbose=False, learning_rate_init=0.001)
+    X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.2)
+
+    cvscore = cross_val_score(classifier, X_tr, y_tr, cv=20).mean()
+    print("Cross validation score: " + str(cvscore))
+
+    st = time.time()
+    classifier.fit(X_tr, y_tr)
+    t_time = time.time() - st
+    print("Train time: " + str(t_time))
+
+    st = time.time()
+    y_pr = classifier.predict(X_te)
+    q_time = time.time() - st
+    print("Query time: " + str(q_time))
+
+    accscore = accuracy_score(y_te, y_pr)
+    print("Test Accuracy: " + str(accscore))
+    write_to_csv(dataname+"_normal_MLP", t_time,q_time,cvscore,accscore)
+    print("done w normal MLP")
+
     pca = PCA(n_components=ncPCA).fit(X)
     ress = pca.transform(X)
     k = list(range(2,5))
     
-    classifier = MLPClassifier(max_iter= 5000, hidden_layer_sizes=(8), activation='logistic', verbose=False, learning_rate_init=0.001)
+    classifier = MLPClassifier(max_iter= 5000, hidden_layer_sizes=(1), activation='logistic', verbose=False, learning_rate_init=0.001)
     X_tr, X_te, y_tr, y_te = train_test_split(ress, y, test_size=0.2)
 
     cvscore = cross_val_score(classifier, X_tr, y_tr, cv=20).mean()
@@ -349,7 +371,7 @@ def runAll(X, y, dataname, ncPCA, ncICA, ncRP, ncSVD):
     ica = FastICA(n_components= ncICA, max_iter=10000, tol=0.1).fit(X)
     ress = ica.transform(X)
     k = list(range(2,5))
-    classifier = MLPClassifier(max_iter= 5000, hidden_layer_sizes=(8), activation='logistic', verbose=False, learning_rate_init=0.001)
+    classifier = MLPClassifier(max_iter= 5000, hidden_layer_sizes=(3), activation='logistic', verbose=False, learning_rate_init=0.001)
     X_tr, X_te, y_tr, y_te = train_test_split(ress, y, test_size=0.2)
 
     cvscore = cross_val_score(classifier, X_tr, y_tr, cv=20).mean()
@@ -373,7 +395,7 @@ def runAll(X, y, dataname, ncPCA, ncICA, ncRP, ncSVD):
     rp = random_projection.SparseRandomProjection(n_components=ncRP)
     ress = rp.fit_transform(X)
     k = list(range(2,5))
-    classifier = MLPClassifier(max_iter= 5000, hidden_layer_sizes=(8), activation='logistic', verbose=False, learning_rate_init=0.001)
+    classifier = MLPClassifier(max_iter= 5000, hidden_layer_sizes=(5), activation='logistic', verbose=False, learning_rate_init=0.001)
     X_tr, X_te, y_tr, y_te = train_test_split(ress, y, test_size=0.2)
 
     cvscore = cross_val_score(classifier, X_tr, y_tr, cv=20).mean()
@@ -397,7 +419,7 @@ def runAll(X, y, dataname, ncPCA, ncICA, ncRP, ncSVD):
     svd = TruncatedSVD(n_components=ncSVD)
     ress = svd.fit_transform(X)
     k = list(range(2,5))
-    classifier = MLPClassifier(max_iter= 5000, hidden_layer_sizes=(8), activation='logistic', verbose=False, learning_rate_init=0.001)
+    classifier = MLPClassifier(max_iter= 5000, hidden_layer_sizes=(1), activation='logistic', verbose=False, learning_rate_init=0.001)
     X_tr, X_te, y_tr, y_te = train_test_split(ress, y, test_size=0.2)
 
     cvscore = cross_val_score(classifier, X_tr, y_tr, cv=20).mean()
