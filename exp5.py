@@ -320,6 +320,45 @@ def write_to_csv(
 
 def runAll(X, y, dataname, ncPCA, ncICA, ncRP, ncSVD, mod, modname):
     print("Running for " + dataname)
+
+    ress = X
+    print(ress.shape)
+    
+    modd=mod(2).fit(ress)
+    lab = modd.predict(ress)
+    print(lab)
+    vms = v_measure_score(y, lab)
+    amis = adjusted_mutual_info_score(y, lab)
+    hs = homogeneity_score(y, lab)
+    resu = pd.concat([pd.DataFrame(ress), pd.DataFrame(lab)], axis=1, sort=False)
+    print(resu.shape)
+    #cc = list(range(0,ncPCA))
+    #cc.append(ncPCA)
+    #resu.columns = cc
+    
+    classifier = MLPClassifier(max_iter= 5000, hidden_layer_sizes=(6), activation='logistic', verbose=False, learning_rate_init=0.001)
+    X_tr, X_te, y_tr, y_te = train_test_split(resu, y, test_size=0.2)
+
+    cvscore = cross_val_score(classifier, X_tr, y_tr, cv=20).mean()
+    print("Cross validation score: " + str(cvscore))
+
+    st = time.time()
+    classifier.fit(X_tr, y_tr)
+    t_time = time.time() - st
+    print("Train time: " + str(t_time))
+
+    st = time.time()
+    y_pr = classifier.predict(X_te)
+    q_time = time.time() - st
+    print("Query time: " + str(q_time))
+
+    accscore = accuracy_score(y_te, y_pr)
+    print("Test Accuracy: " + str(accscore))
+    write_to_csv(dataname+"_"+modname+"_normal_MLP", t_time,q_time,cvscore,accscore, vms, amis, hs)
+    print("done w normal_MLP " + modname)
+
+    return
+
     pca = PCA(n_components=ncPCA).fit(X)
     ress = pca.transform(X)
     
@@ -461,13 +500,13 @@ def run():
     #liver patients
     runAll(liv_full, liv_ans_full.ravel(), "liver_patients", 2, 7, 10,  1, KMeans, "KMeans")
     #bm
-    runAll(bm_full, bm_ans_full.ravel(), "bm", 2, 12, 2,  1, KMeans, "KMeans")
+    #runAll(bm_full, bm_ans_full.ravel(), "bm", 2, 12, 2,  1, KMeans, "KMeans")
 
     ##Gaussian Mixture
     #liver patients
     runAll(liv_full, liv_ans_full.ravel(), "liver_patients", 2, 7, 10,  1, GaussianMixture, "GaussianMixture")
     #bm
-    runAll(bm_full, bm_ans_full.ravel(), "bm", 2, 12, 2,  1, GaussianMixture, "GaussianMixture")
+    #runAll(bm_full, bm_ans_full.ravel(), "bm", 2, 12, 2,  1, GaussianMixture, "GaussianMixture")
 
 
 
